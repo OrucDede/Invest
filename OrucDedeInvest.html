@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DD Toptan Gıda Ltd. Şti. - Gelişmiş Yatırımcı Sunumu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <!-- YENİ: PDF ve Excel için kütüphaneler eklendi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .section-title {
+            font-size: 2.25rem; /* 36px */
+            font-weight: 800;
+            color: #111827; /* gray-900 */
+            border-bottom: 4px solid #4f46e5; /* indigo-600 */
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem; /* 12px */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb; /* gray-200 */
+            padding: 1.5rem; /* 24px */
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .tab-button.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+        }
+        .tab-button:not(.active) {
+            background-color: #eef2ff; /* indigo-100 */
+            color: #3730a3; /* indigo-800 */
+        }
+        /* Slider Stilleri */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #c7d2fe; /* indigo-200 */
+            border-radius: 5px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #4f46e5; /* indigo-600 */
+            cursor: pointer;
+            margin-top: -8px;
+            border: 4px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        .recipe-input, .personnel-input, .fixed-cost-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            text-align: right;
+        }
+        .export-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            margin-left: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #4f46e5;
+            background-color: #eef2ff;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .export-button:hover {
+            background-color: #c7d2fe;
+            color: #3730a3;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Header & Navigasyon -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold text-slate-900">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+gAAAPoAQMAAABnL18YAAAABlBMVEUAAAD///+l2Z/dAAABpklEQVR42u3PMQEAAAgEILV/53m40k4WcEhaAgQIECAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECLwB5pQAAc403VEAAAAASUVORK5CYII=" alt="DD Toptan Gıda Logo" class="h-14">
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#karlilik" class="text-slate-600 hover:text-indigo-600 font-semibold">Kârlılık Simülatörü</a>
+                <a href="#maliyetler" class="text-slate-600 hover:text-indigo-600 font-semibold">Maliyet Yapısı</a>
+                <a href="#urun-analizi" class="text-slate-600 hover:text-indigo-600 font-semibold">Ürün Analizi</a>
+                <a href="#hakkimizda" class="text-slate-600 hover:text-indigo-600 font-semibold">Hakkımızda</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 md:p-8" id="main-content">
+
+        <!-- 1. Giriş Bölümü -->
+        <section class="text-center py-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
+                DD Toptan Gıda Yatırımcı Sunumu:
+            </h1>
+            <p class="mt-4 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
+                Geleneksel lezzetleri modern üretim anlayışıyla birleştirerek, kârlı ve sürdürülebilir bir büyüme hedefine odaklanan DD Toptan Gıda'nın finansal yol haritasını ve yatırım potansiyelini keşfedin.
+            </p>
+            <button id="pdf-export-button" class="mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition duration-300">
+                Raporu PDF İndir
+            </button>
+        </section>
+
+        <!-- 2. Kârlılık Simülatörü -->
+        <section id="karlilik" class="py-16 bg-white -mx-4 sm:-mx-8 px-4 sm:px-8 rounded-2xl shadow-lg">
+            <div class="text-center mb-12">
+                <h2 class="section-title">Gerçekçi Kârlılık ve Strateji Simülatörü</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Helva ve Lokum üretimini bir arada analiz eden bu araçla, ürün karmanızı, fiyatlandırmanızı ve kâr hedeflerinizi belirleyerek en doğru stratejiyi oluşturun.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Ürün Karması Kartı -->
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-4">Ürün Karması (Satış Yüzdesi)</h3>
+                        <input type="range" id="sim-mix" min="0" max="100" value="70" class="w-full">
+                        <div class="flex justify-between mt-2 font-semibold">
+                            <span class="text-blue-600">Helva: <span id="mix-helva-perc">70</span>%</span>
+                            <span class="text-teal-600">Lokum: <span id="mix-lokum-perc">30</span>%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Simülatör Girdileri Kartı -->
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-4">Finansal Girdiler</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="sim-sabitMaliyet" class="block text-sm font-medium text-gray-700 mb-1">Toplam Sabit Maliyet (Aylık)</label>
+                                <input type="text" id="sim-sabitMaliyet" class="w-full p-2 border border-gray-300 rounded-md shadow-sm bg-slate-100" readonly>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="sim-helva-fiyat" class="block text-sm font-medium text-gray-700 mb-1">Helva Fiyatı (kg)</label>
+                                    <input type="text" id="sim-helva-fiyat" class="w-full p-2 border border-gray-300 rounded-md shadow-sm fixed-cost-input">
+                                </div>
+                                <div>
+                                    <label for="sim-lokum-fiyat" class="block text-sm font-medium text-gray-700 mb-1">Lokum Fiyatı (kg)</label>
+                                    <input type="text" id="sim-lokum-fiyat" class="w-full p-2 border border-gray-300 rounded-md shadow-sm fixed-cost-input">
+                                </div>
+                            </div>
+                             <div>
+                                <label for="sim-hedefKar" class="block text-sm font-medium text-gray-700 mb-1">Hedeflenen Kâr (Aylık)</label>
+                                <input type="text" id="sim-hedefKar" class="w-full p-2 border border-gray-300 rounded-md shadow-sm fixed-cost-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sonuçlar Kartı -->
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-4">Analiz Sonuçları</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center"><span class="font-medium">Ortalama Katkı Payı (kg):</span><span id="res-katkiPayi" class="font-bold text-green-600 text-lg"></span></div>
+                            <hr>
+                            <div class="p-3 bg-indigo-50 rounded-lg">
+                                <div class="flex justify-between items-center"><span class="font-bold text-indigo-800">Başa Baş (Toplam Satış):</span><span id="res-basaBasAdet" class="font-bold text-indigo-800 text-xl"></span></div>
+                                <div class="text-sm mt-1 text-indigo-700">
+                                    <div class="flex justify-between"><span>Helva:</span><span id="res-basaBasHelva"></span></div>
+                                    <div class="flex justify-between"><span>Lokum:</span><span id="res-basaBasLokum"></span></div>
+                                </div>
+                            </div>
+                             <div class="p-3 bg-amber-50 rounded-lg">
+                                <div class="flex justify-between items-center"><span class="font-bold text-amber-800">Hedef Kâr (Toplam Satış):</span><span id="res-hedefAdet" class="font-bold text-amber-800 text-xl"></span></div>
+                                 <div class="text-sm mt-1 text-amber-700">
+                                    <div class="flex justify-between"><span>Helva:</span><span id="res-hedefHelva"></span></div>
+                                    <div class="flex justify-between"><span>Lokum:</span><span id="res-hedefLokum"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 card min-h-[500px]">
+                    <canvas id="karlilikChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Maliyet Yapısı Bölümü -->
+        <section id="maliyetler" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="section-title">Maliyet Yapımızın Şeffaf Analizi</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Operasyonel verimliliğimizin temelini oluşturan sabit maliyetlerimizi ve bu maliyetlerin dağılımını detaylı olarak inceliyoruz.</p>
+            </div>
+            
+            <!-- Personel Giderleri Detayı -->
+            <div class="card mb-12">
+                <h3 class="text-2xl font-bold mb-6 text-slate-800 flex items-center">
+                    İnteraktif Personel Gider Simülatörü (Aylık)
+                    <button class="export-button" onclick="exportPersonnelToExcel()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Excel
+                    </button>
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                    <div class="lg:col-span-3">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm" id="personnel-table">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-2 py-2 text-left font-semibold text-slate-600">Pozisyon</th>
+                                        <th class="px-2 py-2 text-center font-semibold text-slate-600">Kişi</th>
+                                        <th class="px-2 py-2 text-right font-semibold text-slate-600">Net Maaş (Birim)</th>
+                                        <th class="px-2 py-2 text-right font-semibold text-slate-600">SGK vb. Gider</th>
+                                        <th class="px-2 py-2 text-right font-semibold text-slate-600">Toplam Maliyet</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tfoot class="border-t-2 border-slate-300"></tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <canvas id="personnelCostChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kira ve Operasyonel Giderler -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Kira Giderleri Detayı -->
+                <div class="card">
+                    <h3 class="text-2xl font-bold mb-6 text-slate-800 flex items-center">
+                        Kira Giderleri (Aylık)
+                        <button class="export-button" onclick="exportRentToExcel()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            Excel
+                        </button>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
+                        <div id="rent-cost-table"></div>
+                        <div><canvas id="rentCostChart"></canvas></div>
+                    </div>
+                </div>
+                <!-- Operasyonel Giderler Detayı -->
+                <div class="card">
+                    <h3 class="text-2xl font-bold mb-6 text-slate-800 flex items-center">
+                        Operasyonel Giderler (Aylık)
+                        <button class="export-button" onclick="exportOperationalToExcel()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            Excel
+                        </button>
+                    </h3>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
+                        <div id="operational-cost-table"></div>
+                        <div><canvas id="operationalCostChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Ürün Bazlı Değişken Maliyet Analizi -->
+        <section id="urun-analizi" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="section-title">Ürünlerimizin Maliyet DNA'sı</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Her bir ürünümüzün 1 kg'lık değişken maliyetini, hammadde fiyat ve miktarlarını anlık değiştirerek simüle edin.</p>
+            </div>
+
+            <div class="flex justify-center mb-8">
+                <div class="flex space-x-4 p-2 bg-indigo-50 rounded-lg">
+                    <button id="tab-helva" class="tab-button active">Helva Maliyet Analizi</button>
+                    <button id="tab-lokum" class="tab-button">Lokum Maliyet Analizi</button>
+                </div>
+            </div>
+
+            <div id="calculator-container">
+                <div id="helva-calculator"></div>
+                <div id="lokum-calculator" class="hidden"></div>
+            </div>
+        </section>
+        
+        <!-- 5. Üretim Kapasitesi -->
+        <section id="kapasite" class="py-16">
+             <div class="text-center mb-12">
+                <h2 class="section-title">Üretim Gücümüz ve Ölçeklenebilirlik</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Mevcut makine parkurumuzla, kârlılık hedeflerimizi rahatlıkla karşılayacak ve pazar talebine cevap verecek üretim kapasitesine sahibiz.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4">Helva Üretim Kapasitesi</h3>
+                    <ul class="space-y-2">
+                        <li class="flex justify-between"><span>Sade / Kakaolu (Aylık):</span> <span class="font-bold">30.360 kg</span></li>
+                        <li class="flex justify-between"><span>Fıstıklı / Fındıklı (Aylık):</span> <span class="font-bold">33.396 kg</span></li>
+                    </ul>
+                </div>
+                 <div class="card">
+                    <h3 class="text-xl font-bold mb-4">Lokum Üretim Kapasitesi</h3>
+                     <ul class="space-y-2">
+                        <li class="flex justify-between"><span>Sade Lokum (Aylık, 6 Makine):</span> <span class="font-bold" id="kapasite-lokum">9.328 kg</span></li>
+                    </ul>
+                    <p class="text-xs mt-2 text-slate-500">*Aylık 22 iş günü varsayılmıştır.</p>
+                </div>
+            </div>
+             <div class="mt-8 text-center bg-green-100 text-green-800 font-semibold p-4 rounded-lg">
+                Simülatördeki satış hedefleri, mevcut üretim kapasitemizin oldukça altındadır. Bu durum, risksiz bir büyüme ve pazar fırsatlarını değerlendirme esnekliği sunmaktadır.
+            </div>
+        </section>
+
+        <!-- HAKKIMIZDA BÖLÜMÜ -->
+        <section id="hakkimizda" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="section-title">Şirket Profili ve Marka Değeri</h2>
+            </div>
+            <div class="card lg:p-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-3xl font-bold text-slate-800">1957'den Gelen Lezzet Mirası</h3>
+                        <p class="mt-4 text-lg text-slate-600">
+                            Oruç Dede markası, 1957 yılından bu yana dededen toruna geçen bir lezzet ve kalite anlayışını temsil etmektedir. Yılların tecrübesiyle geleneksel helva ve lokum çeşitlerini, değişmeyen özgün tatlarıyla üretiyoruz. Bu miras, markamızın en değerli teminatıdır.
+                        </p>
+                    </div>
+                    <div class="flex justify-center items-center">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+gAAAPoAQMAAABnL18YAAAABlBMVEUAAAD///+l2Z/dAAABpklEQVR42u3PMQEAAAgEILV/53m40k4WcEhaAgQIECAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECLwB5pQAAc403VEAAAAASUVORK5CYII=" alt="Oruç Dede Logo" class="max-h-80 rounded-full">
+                    </div>
+                </div>
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+                    <div class="p-6 bg-slate-50 rounded-lg border">
+                        <h4 class="text-2xl font-bold text-slate-800 mb-4">Misyonumuz</h4>
+                        <p class="text-slate-600">En kaliteli hammaddeleri kullanarak, hijyenik koşullarda, insan sağlığını ön planda tutan sağlıklı ve güvenilir ürünler sunmaktır.</p>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-lg border">
+                        <h4 class="text-2xl font-bold text-slate-800 mb-4">Vizyonumuz</h4>
+                        <p class="text-slate-600">Yılların tecrübesiyle geleneksel helva ve lokum çeşitlerini, değişmeyen özgün tatlarıyla üreterek, ulusal ve uluslararası pazarda tanınan, güvenilir ve lider bir marka olmaktır.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-slate-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p class="font-bold text-lg">DD Toptan Gıda Ltd. Şti.</p>
+            <p class="text-slate-400 mt-2">Gelenekten Gelen Lezzet, Geleceğe Güvenle...</p>
+        </div>
+    </footer>
+
+<script>
+// --- GLOBAL HELPER FUNCTIONS ---
+const formatCurrency = (value) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value || 0);
+const formatNumber = (value, digits = 0) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value || 0);
+const parseLocalNumber = (str) => {
+    if (typeof str !== 'string') return str;
+    return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+};
+
+// --- DATA ---
+const RECIPE_DATA = {
+    helva: { output: 230, ingredients: [ { id: 1, name: 'Tahin (Kg)', quantity: 773 / 6, price: 115 }, { id: 2, name: 'Şeker (Kg)', quantity: 600 / 6, price: 32 }, { id: 3, name: 'Vanilya Kg', quantity: 0.2 / 6, price: 360 }, { id: 4, name: 'Çöğen Suyu-Lt', quantity: 4.1 / 6, price: 43 }, { id: 5, name: 'Limon Tuzu-Kg', quantity: 2 / 6, price: 75 } ] },
+    lokum: { output: 70.67, ingredients: [ { id: 1, name: 'Şeker (Kg)', quantity: 50.00, price: 35.00 }, { id: 2, name: 'Su (Kg)', quantity: 9.00, price: 0.06 }, { id: 3, name: 'Mısır Nişastası (Kg)', quantity: 7.60, price: 20.20 }, { id: 4, name: 'Sitrik Asit (E330) (Kg)', quantity: 0.04, price: 75.00 }, { id: 5, name: 'Vanilya (Kg)', quantity: 0.03, price: 300.00 }, { id: 6, name: 'Pudra (Kg)', quantity: 4.00, price: 40.00 } ] }
+};
+const AMBALAJ_MALIYETI_BIRIM = 15.00;
+const SGK_RATE = 0.5; // Net maaşın %50'si
+let personnelData = {
+    yonetim: [
+        { id: 'gm', name: 'Genel Müdür', count: 1, salary: 83000 }, { id: 'muhasebe', name: 'Muhasebeci', count: 1, salary: 45000 }, { id: 'satis', name: 'Satış Yöneticisi', count: 1, salary: 55000 }, { id: 'gida', name: 'Gıda Mühendisi', count: 1, salary: 45000 }, { id: 'ihracat', name: 'İhracat Müdürü', count: 1, salary: 55000 }, { id: 'asci', name: 'Mutfak Aşçısı', count: 1, salary: 30000 }, { id: 'depo', name: 'Depo Sorumlusu/Şoför', count: 1, salary: 30000 }
+    ],
+    uretim: [
+        { id: 'h-usta', name: 'Helva Ustası', count: 1, salary: 45000 }, { id: 'h-yardimci', name: 'Helva Usta Yardımcısı', count: 2, salary: 30000 }, { id: 'h-paket', name: 'Helva Paketleme/Kürek', count: 5, salary: 22104 }, { id: 'l-usta', name: 'Lokum Ustası', count: 1, salary: 45000 }, { id: 'l-personel', name: 'Lokum Personeli', count: 2, salary: 22104 }
+    ]
+};
+let rentData = { net: 320000, stopaj: 80000 };
+let operationalData = { yakit: 50000, enerji: 30000, mutfak: 30000 };
+
+// --- CHARTS & SIMULATORS ---
+let personnelCostChart, rentCostChart, operationalCostChart, karlilikChart;
+
+// --- İNTERAKTİF MALİYET HESAPLAYICILARI (TÜMÜ) ---
+function calculateAllFixedCosts() {
+    // Personel
+    let totalNetSalary = 0, totalSgk = 0, totalYonetimNet = 0, totalUretimNet = 0;
+    document.querySelectorAll('#personnel-table tbody tr[data-id]').forEach(row => {
+        const id = row.dataset.id;
+        const type = row.dataset.type;
+        const pData = personnelData[type].find(p => p.id === id);
+        const count = parseInt(row.querySelector('.count-input').value) || 0;
+        const salary = parseLocalNumber(row.querySelector('.salary-input').value);
+        pData.count = count; pData.salary = salary;
+        const totalSalary = count * salary;
+        const sgk = totalSalary * SGK_RATE;
+        const totalCost = totalSalary + sgk;
+        row.querySelector('.sgk-cost').textContent = formatCurrency(sgk);
+        row.querySelector('.total-cost').textContent = formatCurrency(totalCost);
+        totalNetSalary += totalSalary; totalSgk += sgk;
+        if(type === 'yonetim') totalYonetimNet += totalSalary; else totalUretimNet += totalSalary;
+    });
+    const totalPersonnelCost = totalNetSalary + totalSgk;
+    document.getElementById('total-net-salary').textContent = formatCurrency(totalNetSalary);
+    document.getElementById('total-sgk').textContent = formatCurrency(totalSgk);
+    document.getElementById('grand-total-personnel-cost').textContent = formatCurrency(totalPersonnelCost);
+    personnelCostChart.data.datasets[0].data = [totalYonetimNet, totalUretimNet, totalSgk];
+    personnelCostChart.update();
+
+    // Kira
+    rentData.net = parseLocalNumber(document.getElementById('rent-net-input').value);
+    rentData.stopaj = parseLocalNumber(document.getElementById('rent-stopaj-input').value);
+    const totalRentCost = rentData.net + rentData.stopaj;
+    document.getElementById('rent-total').textContent = formatCurrency(totalRentCost);
+    rentCostChart.data.datasets[0].data = [rentData.net, rentData.stopaj];
+    rentCostChart.update();
+
+    // Operasyonel
+    operationalData.yakit = parseLocalNumber(document.getElementById('op-yakit-input').value);
+    operationalData.enerji = parseLocalNumber(document.getElementById('op-enerji-input').value);
+    operationalData.mutfak = parseLocalNumber(document.getElementById('op-mutfak-input').value);
+    const totalOperationalCost = operationalData.yakit + operationalData.enerji + operationalData.mutfak;
+    document.getElementById('op-total').textContent = formatCurrency(totalOperationalCost);
+    operationalCostChart.data.datasets[0].data = [operationalData.yakit, operationalData.enerji, operationalData.mutfak];
+    operationalCostChart.update();
+
+    // Ana Simülatörü Güncelle
+    const newTotalFixedCost = totalPersonnelCost + totalRentCost + totalOperationalCost;
+    simInputs.sabitMaliyet.value = formatNumber(newTotalFixedCost, 0);
+    updateSimulator();
+}
+
+// --- RENDER FUNCTIONS ---
+function renderPersonnelTable() {
+    const table = document.getElementById('personnel-table');
+    let tbodyHTML = '';
+    tbodyHTML += `<tr class="bg-slate-100 font-bold"><td colspan="5" class="px-4 py-2">Yönetim Personeli</td></tr>`;
+    personnelData.yonetim.forEach(p => {
+        tbodyHTML += `<tr data-id="${p.id}" data-type="yonetim">
+                <td class="px-2 py-2 pl-6">${p.name}</td>
+                <td class="px-2 py-2"><input type="number" value="${p.count}" class="personnel-input count-input"></td>
+                <td class="px-2 py-2"><input type="text" value="${formatNumber(p.salary)}" class="personnel-input salary-input fixed-cost-input"></td>
+                <td class="px-2 py-2 text-right sgk-cost"></td>
+                <td class="px-2 py-2 text-right total-cost"></td>
+            </tr>`;
+    });
+    tbodyHTML += `<tr class="bg-slate-100 font-bold"><td colspan="5" class="px-4 py-2">Üretim Personeli</td></tr>`;
+    personnelData.uretim.forEach(p => {
+        tbodyHTML += `<tr data-id="${p.id}" data-type="uretim">
+                <td class="px-2 py-2 pl-6">${p.name}</td>
+                <td class="px-2 py-2"><input type="number" value="${p.count}" class="personnel-input count-input"></td>
+                <td class="px-2 py-2"><input type="text" value="${formatNumber(p.salary)}" class="personnel-input salary-input fixed-cost-input"></td>
+                <td class="px-2 py-2 text-right sgk-cost"></td>
+                <td class="px-2 py-2 text-right total-cost"></td>
+            </tr>`;
+    });
+    table.querySelector('tbody').innerHTML = tbodyHTML;
+    table.querySelector('tfoot').innerHTML = `
+        <tr><td class="pt-3 font-bold text-slate-900">Toplam Net Maaş</td><td></td><td id="total-net-salary" class="pt-3 text-right font-bold text-slate-900"></td><td id="total-sgk" class="pt-3 text-right font-bold text-slate-900"></td><td></td></tr>
+        <tr><td colspan="4" class="pt-3 text-lg font-bold text-slate-900">PERSONEL GENEL TOPLAM</td><td id="grand-total-personnel-cost" class="pt-3 text-lg text-right font-extrabold text-indigo-600"></td></tr>
+    `;
+}
+
+function renderFixedCostTables() {
+    document.getElementById('rent-cost-table').innerHTML = `
+        <table class="min-w-full">
+            <tbody>
+                <tr><td class="py-2">Net Kira Bedeli</td><td class="py-2"><input id="rent-net-input" type="text" class="fixed-cost-input" value="${formatNumber(rentData.net)}"></td></tr>
+                <tr><td class="py-2">Stopaj Vergisi</td><td class="py-2"><input id="rent-stopaj-input" type="text" class="fixed-cost-input" value="${formatNumber(rentData.stopaj)}"></td></tr>
+            </tbody>
+            <tfoot class="border-t-2 border-slate-300">
+                <tr><td class="pt-2 font-bold">TOPLAM</td><td id="rent-total" class="pt-2 text-right font-bold text-indigo-600"></td></tr>
+            </tfoot>
+        </table>`;
+    document.getElementById('operational-cost-table').innerHTML = `
+        <table class="min-w-full">
+            <tbody>
+                <tr><td class="py-2">Araç Yakıt</td><td class="py-2"><input id="op-yakit-input" type="text" class="fixed-cost-input" value="${formatNumber(operationalData.yakit)}"></td></tr>
+                <tr><td class="py-2">Enerji (Gaz, Su, Elkt.)</td><td class="py-2"><input id="op-enerji-input" type="text" class="fixed-cost-input" value="${formatNumber(operationalData.enerji)}"></td></tr>
+                <tr><td class="py-2">Mutfak Malzemeleri</td><td class="py-2"><input id="op-mutfak-input" type="text" class="fixed-cost-input" value="${formatNumber(operationalData.mutfak)}"></td></tr>
+            </tbody>
+            <tfoot class="border-t-2 border-slate-300">
+                <tr><td class="pt-2 font-bold">TOPLAM</td><td id="op-total" class="pt-2 text-right font-bold text-indigo-600"></td></tr>
+            </tfoot>
+        </table>`;
+}
+
+function createInteractiveRecipeCalculator(type) {
+    const recipe = RECIPE_DATA[type];
+    const tableRows = recipe.ingredients.map(ing => `
+        <tr class="ingredient-row" data-id="${ing.id}">
+            <td class="px-2 py-2 text-sm font-medium text-gray-900">${ing.name}</td>
+            <td class="px-2 py-2"><input type="text" value="${formatNumber(ing.quantity, 2)}" class="recipe-input quantity-input fixed-cost-input"></td>
+            <td class="px-2 py-2"><input type="text" value="${formatNumber(ing.price, 2)}" class="recipe-input price-input fixed-cost-input"></td>
+            <td class="px-2 py-2 text-sm text-gray-700 text-right total-cost">${formatCurrency(ing.quantity * ing.price)}</td>
+        </tr>
+    `).join('');
+
+    return `
+        <div class="card" id="${type}-recipe-card">
+            <h3 class="text-xl font-bold text-center mb-4 flex items-center justify-center">
+                ${type === 'helva' ? 'Helva' : 'Lokum'} İnteraktif Reçete
+                <button class="export-button" onclick="exportRecipeToExcel('${type}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Excel
+                </button>
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Malzeme</th>
+                            <th class="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase">Miktar</th>
+                            <th class="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase">Birim Fiyat</th>
+                            <th class="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase">Toplam</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">${tableRows}</tbody>
+                </table>
+            </div>
+            <div class="mt-4 pt-4 border-t-2 space-y-2">
+                 <div class="flex justify-between items-center text-md">
+                    <span class="font-semibold text-slate-700">Toplam Hammadde Maliyeti:</span>
+                    <span class="font-bold text-slate-900" id="${type}-hammadde-total"></span>
+                </div>
+                <div class="flex justify-between items-center text-md">
+                    <span class="font-semibold text-slate-700">1 kg Hammadde Maliyeti:</span>
+                    <span class="font-bold text-slate-900" id="${type}-hammadde-per-kg"></span>
+                </div>
+                <hr>
+                <div class="flex justify-between items-center text-xl p-3 bg-green-50 rounded-lg">
+                    <span class="font-bold text-green-800">1 kg Toplam Değişken Maliyet:</span>
+                    <span class="font-extrabold text-green-900" id="${type}-total-variable-cost"></span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+function calculateRecipeCost(type) {
+    const card = document.getElementById(`${type}-recipe-card`);
+    const recipe = RECIPE_DATA[type];
+    let totalHammaddeCost = 0;
+
+    card.querySelectorAll('.ingredient-row').forEach(row => {
+        const quantity = parseLocalNumber(row.querySelector('.quantity-input').value);
+        const price = parseLocalNumber(row.querySelector('.price-input').value);
+        const total = quantity * price;
+        row.querySelector('.total-cost').textContent = formatCurrency(total);
+        totalHammaddeCost += total;
+    });
+
+    const hammaddePerKg = totalHammaddeCost / recipe.output;
+    const totalVariableCost = hammaddePerKg + AMBALAJ_MALIYETI_BIRIM;
+
+    document.getElementById(`${type}-hammadde-total`).textContent = formatCurrency(totalHammaddeCost);
+    document.getElementById(`${type}-hammadde-per-kg`).textContent = formatCurrency(hammaddePerKg);
+    document.getElementById(`${type}-total-variable-cost`).textContent = formatCurrency(totalVariableCost);
+}
+function renderCalculators(activeTab = 'helva') {
+    const helvaContainer = document.getElementById('helva-calculator');
+    const lokumContainer = document.getElementById('lokum-calculator');
+    
+    helvaContainer.innerHTML = createInteractiveRecipeCalculator('helva');
+    lokumContainer.innerHTML = createInteractiveRecipeCalculator('lokum');
+
+    calculateRecipeCost('helva');
+    calculateRecipeCost('lokum');
+
+    helvaContainer.querySelectorAll('.recipe-input').forEach(input => input.addEventListener('input', () => calculateRecipeCost('helva')));
+    lokumContainer.querySelectorAll('.recipe-input').forEach(input => input.addEventListener('input', () => calculateRecipeCost('lokum')));
+
+    if (activeTab === 'helva') {
+        helvaContainer.classList.remove('hidden');
+        lokumContainer.classList.add('hidden');
+        document.getElementById('tab-helva').classList.add('active');
+        document.getElementById('tab-lokum').classList.remove('active');
+    } else {
+        helvaContainer.classList.add('hidden');
+        lokumContainer.classList.remove('hidden');
+        document.getElementById('tab-helva').classList.remove('active');
+        document.getElementById('tab-lokum').classList.add('active');
+    }
+}
+const simInputs = {
+    sabitMaliyet: document.getElementById('sim-sabitMaliyet'),
+    mix: document.getElementById('sim-mix'),
+    helvaFiyat: document.getElementById('sim-helva-fiyat'),
+    lokumFiyat: document.getElementById('sim-lokum-fiyat'),
+    hedefKar: document.getElementById('sim-hedefKar'),
+};
+const simResults = {
+    katkiPayi: document.getElementById('res-katkiPayi'),
+    basaBasAdet: document.getElementById('res-basaBasAdet'),
+    basaBasHelva: document.getElementById('res-basaBasHelva'),
+    basaBasLokum: document.getElementById('res-basaBasLokum'),
+    hedefAdet: document.getElementById('res-hedefAdet'),
+    hedefHelva: document.getElementById('res-hedefHelva'),
+    hedefLokum: document.getElementById('res-hedefLokum'),
+    mixHelvaPerc: document.getElementById('mix-helva-perc'),
+    mixLokumPerc: document.getElementById('mix-lokum-perc'),
+};
+
+function updateSimulator() {
+    const sabit = parseLocalNumber(simInputs.sabitMaliyet.value);
+    const helvaMix = parseFloat(simInputs.mix.value) / 100;
+    const lokumMix = 1 - helvaMix;
+    const helvaFiyat = parseLocalNumber(simInputs.helvaFiyat.value);
+    const lokumFiyat = parseLocalNumber(simInputs.lokumFiyat.value);
+    const hedef = parseLocalNumber(simInputs.hedefKar.value);
+    simResults.mixHelvaPerc.textContent = (helvaMix * 100).toFixed(0);
+    simResults.mixLokumPerc.textContent = (lokumMix * 100).toFixed(0);
+    const helvaDegiskenMaliyet = (RECIPE_DATA.helva.ingredients.reduce((acc, ing) => acc + ing.quantity * ing.price, 0) / RECIPE_DATA.helva.output) + AMBALAJ_MALIYETI_BIRIM;
+    const lokumDegiskenMaliyet = (RECIPE_DATA.lokum.ingredients.reduce((acc, ing) => acc + ing.quantity * ing.price, 0) / RECIPE_DATA.lokum.output) + AMBALAJ_MALIYETI_BIRIM;
+    const ortalamaFiyat = (helvaFiyat * helvaMix) + (lokumFiyat * lokumMix);
+    const ortalamaDegiskenMaliyet = (helvaDegiskenMaliyet * helvaMix) + (lokumDegiskenMaliyet * lokumMix);
+    const ortalamaKatkiPayi = ortalamaFiyat - ortalamaDegiskenMaliyet;
+    const basaBasAdet = ortalamaKatkiPayi > 0 ? Math.ceil(sabit / ortalamaKatkiPayi) : 0;
+    const hedefAdet = ortalamaKatkiPayi > 0 ? Math.ceil((sabit + hedef) / ortalamaKatkiPayi) : 0;
+    simResults.katkiPayi.textContent = formatCurrency(ortalamaKatkiPayi);
+    simResults.basaBasAdet.textContent = `${formatNumber(basaBasAdet)} kg`;
+    simResults.basaBasHelva.textContent = `${formatNumber(basaBasAdet * helvaMix)} kg`;
+    simResults.basaBasLokum.textContent = `${formatNumber(basaBasAdet * lokumMix)} kg`;
+    simResults.hedefAdet.textContent = `${formatNumber(hedefAdet)} kg`;
+    simResults.hedefHelva.textContent = `${formatNumber(hedefAdet * helvaMix)} kg`;
+    simResults.hedefLokum.textContent = `${formatNumber(hedefAdet * lokumMix)} kg`;
+    updateChart(sabit, ortalamaDegiskenMaliyet, ortalamaFiyat, basaBasAdet, hedefAdet);
+}
+function updateChart(sabit, degisken, fiyat, basaBasAdet, hedefAdet) {
+    if (!karlilikChart) return;
+    const maxAdet = Math.max(1000, Math.ceil(basaBasAdet * 1.3), Math.ceil(hedefAdet * 1.1));
+    const labels = [];
+    const gelirData = [];
+    const maliyetData = [];
+    for (let i = 0; i <= 10; i++) {
+        const adet = Math.round((maxAdet / 10) * i);
+        labels.push(adet);
+        gelirData.push(adet * fiyat);
+        maliyetData.push(sabit + (adet * degisken));
+    }
+    karlilikChart.data.labels = labels;
+    karlilikChart.data.datasets[0].data = gelirData;
+    karlilikChart.data.datasets[1].data = maliyetData;
+    karlilikChart.options.plugins.annotation.annotations.basaBasCizgisi.xMin = basaBasAdet;
+    karlilikChart.options.plugins.annotation.annotations.basaBasCizgisi.xMax = basaBasAdet;
+    karlilikChart.options.plugins.annotation.annotations.hedefNoktasi.xValue = hedefAdet;
+    karlilikChart.options.plugins.annotation.annotations.hedefNoktasi.yValue = hedefAdet * fiyat;
+    karlilikChart.update();
+}
+function initializeSimulator() {
+    simInputs.helvaFiyat.value = formatNumber(160);
+    simInputs.lokumFiyat.value = formatNumber(85); 
+    simInputs.hedefKar.value = formatNumber(250000);
+    Object.values(simInputs).forEach(input => {
+        if(input.id !== 'sim-sabitMaliyet') {
+            input.addEventListener('input', updateSimulator);
+        }
+    });
+    const ctx = document.getElementById('karlilikChart').getContext('2d');
+    const chartData = { labels: [], datasets: [ { label: 'Ortalama Gelir', data: [], borderColor: '#16a34a', tension: 0.1 }, { label: 'Toplam Maliyet', data: [], borderColor: '#dc2626', tension: 0.1 } ] };
+    const annotationPlugin = {
+        id: 'annotation',
+        afterDraw(chart, args, options) {
+            const {ctx, chartArea: {top, bottom, left, right}, scales: {x, y}} = chart;
+            ctx.save();
+            const basaBasX = x.getPixelForValue(options.annotations.basaBasCizgisi.xMin);
+            if(basaBasX >= left && basaBasX <= right) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#4f46e580';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.moveTo(basaBasX, top);
+                ctx.lineTo(basaBasX, bottom);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#4f46e5';
+                ctx.textAlign = 'center';
+                ctx.fillText('Başa Baş', basaBasX, top + 15);
+            }
+            const hedefX = x.getPixelForValue(options.annotations.hedefNoktasi.xValue);
+            const hedefY = y.getPixelForValue(options.annotations.hedefNoktasi.yValue);
+            if(hedefX >= left && hedefX <= right && hedefY >= top && hedefY <= bottom) {
+                 ctx.beginPath();
+                 ctx.arc(hedefX, hedefY, 8, 0, 2 * Math.PI);
+                 ctx.fillStyle = '#f59e0b';
+                 ctx.fill();
+                 ctx.strokeStyle = 'white';
+                 ctx.lineWidth = 2;
+                 ctx.stroke();
+                 ctx.fillStyle = '#ca8a04';
+                 ctx.textAlign = 'center';
+                 ctx.font = '600 14px Inter';
+                 ctx.fillText('Hedef', hedefX, hedefY - 15);
+            }
+            ctx.restore();
+        }
+    };
+    karlilikChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        plugins: [annotationPlugin],
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}` } },
+                annotation: { annotations: { basaBasCizgisi: { type: 'line', xMin: 0, xMax: 0 }, hedefNoktasi: { type: 'point', xValue: 0, yValue: 0 } } }
+            },
+            scales: {
+                y: { ticks: { callback: (value) => formatCurrency(value) } },
+                x: { ticks: { callback: (value, index) => formatNumber(karlilikChart.data.labels[index]) } }
+            }
+        }
+    });
+}
+function createPieChart(canvasId, chartTitle, chartLabels, chartData) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) { return null; }
+    const ctx = canvas.getContext('2d');
+    return new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: chartLabels,
+            datasets: [{ label: chartTitle, data: chartData, backgroundColor: [ '#4338ca', '#6366f1', '#a5b4fc', '#c7d2fe' ], borderColor: '#ffffff', borderWidth: 2 }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += formatCurrency(context.parsed); } return label; } } }
+            }
+        }
+    });
+}
+
+// --- EXPORT FUNCTIONS ---
+function exportPDF() {
+    const btn = document.getElementById('pdf-export-button');
+    btn.textContent = 'PDF Oluşturuluyor...';
+    const content = document.getElementById('main-content');
+    html2canvas(content, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const ratio = canvasWidth / canvasHeight;
+        const imgHeight = pdfWidth / ratio;
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
+        }
+        pdf.save('DD-Toptan-Gida-Yatirimci-Raporu.pdf');
+        btn.textContent = 'Raporu PDF İndir';
+    });
+}
+
+function exportToExcel(data, fileName) {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Veri");
+    XLSX.writeFile(wb, fileName);
+}
+
+function exportPersonnelToExcel() {
+    const data = [];
+    data.push({ Grup: 'Yönetim Personeli' });
+    personnelData.yonetim.forEach(p => {
+        const net = p.count * p.salary;
+        data.push({ Pozisyon: p.name, 'Kişi Sayısı': p.count, 'Net Maaş': net, 'SGK Gideri': net * SGK_RATE, 'Toplam Maliyet': net * (1 + SGK_RATE) });
+    });
+    data.push({ Grup: 'Üretim Personeli' });
+    personnelData.uretim.forEach(p => {
+        const net = p.count * p.salary;
+        data.push({ Pozisyon: p.name, 'Kişi Sayısı': p.count, 'Net Maaş': net, 'SGK Gideri': net * SGK_RATE, 'Toplam Maliyet': net * (1 + SGK_RATE) });
+    });
+    exportToExcel(data, 'Personel-Giderleri.xlsx');
+}
+
+function exportRentToExcel() {
+    const data = [
+        { Kalem: 'Net Kira Bedeli', Tutar: rentData.net },
+        { Kalem: 'Stopaj Vergisi', Tutar: rentData.stopaj },
+        { Kalem: 'TOPLAM', Tutar: rentData.net + rentData.stopaj }
+    ];
+    exportToExcel(data, 'Kira-Giderleri.xlsx');
+}
+
+function exportOperationalToExcel() {
+    const data = [
+        { Kalem: 'Araç Yakıt', Tutar: operationalData.yakit },
+        { Kalem: 'Enerji (Gaz, Su, Elkt.)', Tutar: operationalData.enerji },
+        { Kalem: 'Mutfak Malzemeleri', Tutar: operationalData.mutfak },
+        { Kalem: 'TOPLAM', Tutar: operationalData.yakit + operationalData.enerji + operationalData.mutfak }
+    ];
+    exportToExcel(data, 'Operasyonel-Giderler.xlsx');
+}
+
+function exportRecipeToExcel(type) {
+    const recipe = RECIPE_DATA[type];
+    const data = recipe.ingredients.map(ing => ({
+        Malzeme: ing.name,
+        Miktar: ing.quantity,
+        'Birim Fiyat': ing.price,
+        'Toplam Maliyet': ing.quantity * ing.price
+    }));
+    exportToExcel(data, `${type}-recetesi.xlsx`);
+}
+
+
+// --- INITIALIZE ---
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('tab-helva').addEventListener('click', () => renderCalculators('helva'));
+    document.getElementById('tab-lokum').addEventListener('click', () => renderCalculators('lokum'));
+    document.getElementById('pdf-export-button').addEventListener('click', exportPDF);
+    
+    renderPersonnelTable();
+    renderFixedCostTables();
+    renderCalculators('helva');
+
+    initializeSimulator();
+    personnelCostChart = createPieChart('personnelCostChart', 'Personel Gider Dağılımı', ['Yönetim Net Maaş', 'Üretim Net Maaş', 'SGK vb. Giderler'], [0,0,0]);
+    rentCostChart = createPieChart('rentCostChart', 'Kira Gider Dağılımı', ['Net Kira', 'Stopaj'], [0,0]);
+    operationalCostChart = createPieChart('operationalCostChart', 'Operasyonel Gider Dağılımı', ['Yakıt', 'Enerji', 'Mutfak'], [0,0,0]);
+
+    calculateAllFixedCosts(); 
+    
+    document.querySelectorAll('.fixed-cost-input').forEach(input => {
+        input.addEventListener('input', calculateAllFixedCosts);
+        input.addEventListener('focus', (e) => { e.target.value = parseLocalNumber(e.target.value); });
+        input.addEventListener('blur', (e) => { e.target.value = formatNumber(parseLocalNumber(e.target.value)); });
+    });
+    document.querySelectorAll('.personnel-input').forEach(input => input.addEventListener('input', calculateAllFixedCosts));
+     document.querySelectorAll('.personnel-input.salary-input').forEach(input => {
+        input.addEventListener('focus', (e) => { e.target.value = parseLocalNumber(e.target.value); });
+        input.addEventListener('blur', (e) => { e.target.value = formatNumber(parseLocalNumber(e.target.value)); });
+    });
+
+
+    document.getElementById('kapasite-lokum').textContent = formatNumber(70.67 * 6 * 22) + ' kg';
+});
+
+</script>
+
+</body>
+</html>
